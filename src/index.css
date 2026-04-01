@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1e40af;
+  --color-primary-light: #3b82f6;
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-accent: #0ea5e9;
+  --color-green: #16a34a;
+  --color-green-light: #dcfce7;
+  --color-red: #dc2626;
+  --color-red-light: #fee2e2;
+  --color-orange: #ea580c;
+  --color-orange-light: #fff7ed;
+  --color-purple: #7c3aed;
+  --color-surface: #ffffff;
+  --color-bg: #f8f9fc;
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-sidebar: #ffffff;
+  --color-sidebar-active: #eff6ff;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+}
+
+@layer utilities {
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card-sm {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .badge-green {
+    background: var(--color-green-light);
+    color: var(--color-green);
+  }
+  .badge-red {
+    background: var(--color-red-light);
+    color: var(--color-red);
+  }
+  .badge-blue {
+    background: var(--color-primary-100);
+    color: var(--color-primary);
+  }
+  .badge-orange {
+    background: var(--color-orange-light);
+    color: var(--color-orange);
+  }
+}
