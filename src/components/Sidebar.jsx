@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { LayoutDashboard, Globe, FlaskConical, Bell, CheckCircle, Loader, ChevronDown, ChevronUp, LogOut } from 'lucide-react';
+import { LayoutDashboard, Globe, FlaskConical, Bell, CheckCircle, Loader, LogOut } from 'lucide-react';
 import { researchHistory } from '../data/mockData';
 
 const navItems = [
@@ -10,7 +9,6 @@ const navItems = [
 ];
 
 export default function Sidebar({ active, onNavigate, user, onLogout }) {
-  const [expandedResearch, setExpandedResearch] = useState(null);
   return (
     <aside className="w-[220px] h-screen bg-surface border-r border-border flex flex-col shrink-0">
       {/* Logo */}
@@ -57,35 +55,20 @@ export default function Sidebar({ active, onNavigate, user, onLogout }) {
           {researchHistory.map(r => {
             const StatusIcon = r.status === 'completed' ? CheckCircle : Loader;
             const statusColor = r.status === 'completed' ? 'text-green' : 'text-primary';
-            const isExpanded = expandedResearch === r.id;
             return (
-              <div key={r.id}>
-                <button
-                  onClick={() => setExpandedResearch(isExpanded ? null : r.id)}
-                  className="w-full flex items-start gap-2 px-2 py-2 rounded-lg text-left hover:bg-gray-50 transition cursor-pointer group"
-                >
-                  <StatusIcon size={13} className={`${statusColor} mt-0.5 shrink-0 ${r.status === 'in-progress' ? 'animate-spin' : ''}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] font-medium text-text-primary truncate group-hover:text-primary transition-colors">
-                      {r.title}
-                    </div>
-                    <div className="text-[10px] text-text-tertiary">{r.date}</div>
+              <button
+                key={r.id}
+                onClick={() => onNavigate('workspace')}
+                className="w-full flex items-start gap-2 px-2 py-2 rounded-lg text-left hover:bg-gray-50 transition cursor-pointer group"
+              >
+                <StatusIcon size={13} className={`${statusColor} mt-0.5 shrink-0 ${r.status === 'in-progress' ? 'animate-spin' : ''}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[11px] font-medium text-text-primary truncate group-hover:text-primary transition-colors">
+                    {r.title}
                   </div>
-                  {isExpanded ? <ChevronUp size={11} className="text-text-tertiary mt-1 shrink-0" /> : <ChevronDown size={11} className="text-text-tertiary mt-1 shrink-0" />}
-                </button>
-                {isExpanded && (
-                  <div className="ml-5 mr-1 mb-1 px-2 py-2 bg-bg rounded-lg text-[10px] text-text-secondary leading-relaxed">
-                    <p className="mb-1.5">{r.summary}</p>
-                    {r.status === 'in-progress' ? (
-                      <span className="text-primary font-medium">Research in progress...</span>
-                    ) : (
-                      <button onClick={() => onNavigate('workspace')} className="text-primary font-medium hover:text-primary-light cursor-pointer">
-                        View Full Report →
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
+                  <div className="text-[10px] text-text-tertiary">{r.date}</div>
+                </div>
+              </button>
             );
           })}
         </div>

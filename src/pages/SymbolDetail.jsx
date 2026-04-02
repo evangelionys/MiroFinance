@@ -490,14 +490,24 @@ export default function SymbolDetail({ symbol, onBack }) {
         <div className="card overflow-x-auto p-0">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="text-[14px] font-semibold">Historical Prices</h3>
-            <div className="flex gap-1 bg-bg rounded-lg p-0.5">
-              {timeRanges.map(r => (
-                <button key={r} onClick={() => setHistFreq(r)}
-                  className={`px-2.5 py-1.5 text-[11px] font-medium rounded-md transition cursor-pointer
-                    ${histFreq === r ? 'bg-surface shadow-sm text-text-primary font-bold' : 'text-text-tertiary'}`}>
-                  {r}
-                </button>
-              ))}
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1 bg-bg rounded-lg p-0.5">
+                {['Daily', 'Weekly', 'Monthly'].map(f => (
+                  <button key={f} onClick={() => setHistFreq(f)}
+                    className={`px-2.5 py-1.5 text-[11px] font-medium rounded-md transition cursor-pointer
+                      ${histFreq === f ? 'bg-surface shadow-sm text-text-primary font-bold' : 'text-text-tertiary'}`}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-1 bg-bg rounded-lg p-0.5">
+                {timeRanges.map(r => (
+                  <button key={r}
+                    className="px-2 py-1.5 text-[11px] font-medium rounded-md text-text-tertiary hover:text-text-primary cursor-pointer transition">
+                    {r}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <table className="w-full text-[12px]">

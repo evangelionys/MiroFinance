@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Newspaper, BarChart3, Globe, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { TrendingUp, TrendingDown, Globe, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { LineChart, Line, ResponsiveContainer, Treemap } from 'recharts';
 import { macroOpportunities } from '../data/mockData';
+import RecommendationCard from '../components/RecommendationCard';
+import NewsCard from '../components/NewsCard';
 
 // --- Macro data (Yahoo Finance style tabs) ---
 const marketData = {
@@ -97,16 +99,14 @@ const sectorData = [
 ];
 
 const newsAnalysis = [
-  { id: 'na-1', category: 'News', title: 'Federal Reserve Signals Patience on Rate Cuts Amid Sticky Inflation', summary: 'Fed Chair Powell emphasized data dependency, noting that recent inflation readings have been "somewhat elevated" and the central bank needs greater confidence before easing. Markets repriced to expect only one cut in 2026.', source: 'Reuters', time: '45m ago', image: '📰', tickers: ['SPY', 'QQQ'] },
-  { id: 'na-2', category: 'Research', title: 'Goldman Sachs: AI Capex Cycle Has Room to Run — Raise Semi Estimates', summary: 'GS upgrades semiconductor sector to Overweight, arguing AI infrastructure spending will accelerate in H2 2026. Top picks include NVDA, AVGO, and MRVL. Raises NVDA price target to $240.', source: 'Goldman Sachs', time: '2h ago', image: '📊', tickers: ['NVDA', 'AVGO'] },
-  { id: 'na-3', category: 'Analysis', title: 'Oil Markets Face Supply Squeeze as OPEC+ Holds Production Steady', summary: 'OPEC+ surprised markets by maintaining current production cuts through Q3 2026. Brent crude rallied above $107/bbl. Energy stocks set to benefit from tightening supply-demand balance.', source: 'Bloomberg', time: '3h ago', image: '🛢️', tickers: ['XOM'] },
-  { id: 'na-4', category: 'News', title: 'China GDP Growth Beats Expectations at 5.4% in Q1 2026', summary: 'China\'s economy grew 5.4% year-over-year in Q1, driven by manufacturing exports and government stimulus. Tech and consumer stocks in Hong Kong rallied on the data.', source: 'CNBC', time: '4h ago', image: '🌏', tickers: ['TCEHY'] },
-  { id: 'na-5', category: 'Research', title: 'Morgan Stanley: US Housing Market Turning — Homebuilder Upgrade', summary: 'MS upgrades homebuilders to Overweight, citing improving affordability and pent-up demand. DHI and LEN highlighted as top picks with 25%+ upside potential.', source: 'Morgan Stanley', time: '5h ago', image: '🏠', tickers: [] },
-  { id: 'na-6', category: 'Analysis', title: 'The Dollar Dilemma: Why DXY Strength May Not Last', summary: 'Despite the Fed\'s hawkish stance, structural factors including twin deficits and de-dollarization trends suggest the dollar rally is approaching its limits. EUR and JPY positioning increasingly bullish.', source: 'FT', time: '6h ago', image: '💱', tickers: [] },
-  { id: 'na-7', category: 'News', title: 'Apple Announces $110B Stock Buyback — Largest in Corporate History', summary: 'Apple authorized a record $110 billion share repurchase program alongside a 4% dividend increase. The stock rose 3% in after-hours trading.', source: 'WSJ', time: '8h ago', image: '🍎', tickers: ['AAPL'] },
-  { id: 'na-8', category: 'Research', title: 'JPMorgan: Emerging Markets Set for Multi-Year Outperformance', summary: 'JPM\'s EM strategy team argues for structural EM overweight, driven by favorable demographics, commodity exposure, and AI-related manufacturing buildout in Vietnam and India.', source: 'JPMorgan', time: '10h ago', image: '🌍', tickers: [] },
-  { id: 'na-9', category: 'Analysis', title: 'Crypto Regulatory Clarity Drives Institutional Adoption', summary: 'New SEC framework for digital asset classification is accelerating institutional crypto adoption. Bitcoin ETF assets surpassed $120B, with Ethereum ETFs gaining momentum.', source: 'CoinDesk', time: '12h ago', image: '₿', tickers: ['BTC-USD'] },
-  { id: 'na-10', category: 'News', title: 'EU Carbon Border Tax Takes Effect — Impact on Global Trade', summary: 'The EU\'s Carbon Border Adjustment Mechanism (CBAM) officially entered its definitive phase, imposing tariffs on carbon-intensive imports. Steel and aluminum producers face the biggest impact.', source: 'Reuters', time: '1d ago', image: '🌱', tickers: [] },
+  { id: 'na-1', category: 'News', title: 'Federal Reserve Signals Patience on Rate Cuts Amid Sticky Inflation', summary: 'Fed Chair Powell emphasized data dependency, noting that recent inflation readings have been "somewhat elevated" and the central bank needs greater confidence before easing.', image: '📰', sourceCount: 3, sources: ['Reuters', 'Bloomberg', 'CNBC'], time: '45m ago', tickers: [{ symbol: 'SPY', price: 572.30, changePct: -1.74 }] },
+  { id: 'na-2', category: 'Analysis', title: 'Goldman Sachs: AI Capex Cycle Has Room to Run — Raise Semi Estimates', summary: 'GS upgrades semiconductor sector to Overweight, arguing AI infrastructure spending will accelerate in H2 2026. Raises NVDA price target to $240.', image: '📊', sourceCount: 2, sources: ['Goldman Sachs', 'Bloomberg'], time: '2h ago', tickers: [{ symbol: 'NVDA', price: 171.24, changePct: -4.16 }, { symbol: 'AVGO', price: 309.51, changePct: 5.49 }] },
+  { id: 'na-3', category: 'Analysis', title: 'Oil Markets Face Supply Squeeze as OPEC+ Holds Production Steady', summary: 'OPEC+ surprised markets by maintaining current production cuts through Q3 2026. Brent crude rallied above $107/bbl.', image: '🛢️', sourceCount: 2, sources: ['Bloomberg', 'Reuters'], time: '3h ago', tickers: [{ symbol: 'XOM', price: 118.56, changePct: -5.23 }] },
+  { id: 'na-4', category: 'News', title: 'China GDP Growth Beats Expectations at 5.4% in Q1 2026', summary: 'China\'s economy grew 5.4% year-over-year in Q1, driven by manufacturing exports and government stimulus.', image: '🌏', sourceCount: 3, sources: ['CNBC', 'Reuters', 'SCMP'], time: '4h ago', tickers: [{ symbol: 'TCEHY', price: 62.74, changePct: -2.52 }] },
+  { id: 'na-5', category: 'Analysis', title: 'The Dollar Dilemma: Why DXY Strength May Not Last', summary: 'Despite the Fed\'s hawkish stance, structural factors including twin deficits and de-dollarization trends suggest the dollar rally is approaching its limits.', image: '💱', sourceCount: 2, sources: ['FT', 'WSJ'], time: '6h ago', tickers: [] },
+  { id: 'na-6', category: 'News', title: 'Apple Announces $110B Stock Buyback — Largest in Corporate History', summary: 'Apple authorized a record $110 billion share repurchase program alongside a 4% dividend increase.', image: '🍎', sourceCount: 4, sources: ['WSJ', 'Bloomberg', 'Reuters', 'CNBC'], time: '8h ago', tickers: [{ symbol: 'AAPL', price: 242.56, changePct: -1.31 }] },
+  { id: 'na-7', category: 'Analysis', title: 'Crypto Regulatory Clarity Drives Institutional Adoption', summary: 'New SEC framework for digital asset classification is accelerating institutional crypto adoption. Bitcoin ETF assets surpassed $120B.', image: '₿', sourceCount: 3, sources: ['CoinDesk', 'Bloomberg', 'SEC.gov'], time: '12h ago', tickers: [{ symbol: 'BTC-USD', price: 67830, changePct: -1.39 }] },
+  { id: 'na-8', category: 'News', title: 'EU Carbon Border Tax Takes Effect — Impact on Global Trade', summary: 'The EU\'s CBAM officially entered its definitive phase, imposing tariffs on carbon-intensive imports.', image: '🌱', sourceCount: 2, sources: ['Reuters', 'FT'], time: '1d ago', tickers: [] },
 ];
 
 const tabs = Object.keys(marketData);
@@ -124,13 +124,11 @@ function MiniSparkline({ data, color }) {
 
 export default function MacroIntelligence({ onSymbolClick }) {
   const [activeTab, setActiveTab] = useState('US Markets');
-  const [expandedOpp, setExpandedOpp] = useState(null);
-  const [expandedOppSources, setExpandedOppSources] = useState(null);
+  // removed expandedOpp/expandedOppSources — now handled by RecommendationCard
   const [moverTab, setMoverTab] = useState('Gainers');
   const [watchPage, setWatchPage] = useState(0);
   const [newsFilter, setNewsFilter] = useState('All');
 
-  const urgencyColors = { high: 'badge-red', medium: 'badge-orange', low: 'badge-blue' };
   const currentMarket = marketData[activeTab];
 
   return (
@@ -153,7 +151,7 @@ export default function MacroIntelligence({ onSymbolClick }) {
           {/* Horizontal scrollable market items */}
           <div className="flex gap-3 overflow-x-auto pb-2">
             {currentMarket.map(item => (
-              <div key={item.symbol} className="card-sm shrink-0 w-[165px]">
+              <div key={item.symbol} onClick={() => onSymbolClick?.(item.symbol)} className="card-sm shrink-0 w-[165px] cursor-pointer hover:shadow-sm transition">
                 <div className="flex items-start justify-between mb-1">
                   <div>
                     <div className="text-[11px] font-semibold text-text-primary">{item.name}</div>
@@ -176,81 +174,146 @@ export default function MacroIntelligence({ onSymbolClick }) {
           </div>
         </section>
 
-        {/* Opportunities (same format as Home recommendations) */}
+        {/* Opportunities */}
         <section>
           <div className="flex items-center gap-2 mb-4">
             <Globe size={18} className="text-primary" />
             <h2 className="text-[16px] font-semibold">Opportunities</h2>
           </div>
           <div className="space-y-3">
-            {macroOpportunities.map(opp => {
-              const isExpanded = expandedOpp === opp.id;
-              const sourcesOpen = expandedOppSources === opp.id;
-              return (
-                <div key={opp.id} className="card">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className={`badge ${urgencyColors[opp.urgency] || 'badge-blue'}`}>{opp.urgency}</span>
-                    <button onClick={() => setExpandedOppSources(sourcesOpen ? null : opp.id)}
-                      className="text-[11px] text-text-tertiary hover:text-primary cursor-pointer">
-                      {opp.sourceCount} sources {sourcesOpen ? '▲' : '▼'}
+            {macroOpportunities.map(opp => (
+              <RecommendationCard key={opp.id} rec={opp} onSymbolClick={onSymbolClick} />
+            ))}
+          </div>
+          <button className="mt-3 w-full py-2.5 text-[12px] font-medium text-primary hover:bg-primary-50 rounded-lg transition cursor-pointer">
+            View History →
+          </button>
+        </section>
+
+        {/* S&P 500 Heatmap */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[16px] font-semibold">S&P 500 Heatmap</h2>
+            <button className="flex items-center gap-1 text-[11px] text-text-tertiary hover:text-primary cursor-pointer">
+              Expand <Maximize2 size={12} />
+            </button>
+          </div>
+          <div className="card p-2 overflow-hidden">
+            <div className="grid grid-cols-6 gap-0.5 text-[9px] font-semibold" style={{ minHeight: 280 }}>
+              {/* Technology */}
+              <div className="col-span-2 row-span-3 bg-green/10 rounded p-1.5 flex flex-col">
+                <span className="text-[10px] text-text-secondary mb-1">Technology +1.51%</span>
+                <div className="grid grid-cols-3 gap-0.5 flex-1">
+                  {[{s:'NVDA',c:0.77},{s:'AVGO',c:1.29},{s:'AAPL',c:0.73},{s:'MSFT',c:-0.22},{s:'AMD',c:3.33},{s:'ORCL',c:-1.24},{s:'INTC',c:8.84},{s:'QCOM',c:0.5},{s:'MU',c:8.88}].map(t => (
+                    <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                      className={`rounded p-0.5 text-center cursor-pointer hover:opacity-80 transition ${t.c >= 0 ? 'bg-green/20 text-green' : 'bg-red/10 text-red'}`}>
+                      <div className="font-bold text-[8px]">{t.s}</div>
+                      <div className="text-[7px]">{t.c >= 0 ? '+' : ''}{t.c}%</div>
                     </button>
-                    <span className="text-[11px] text-text-tertiary">{opp.timestamp}</span>
-                  </div>
-                  {sourcesOpen && (
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      {opp.sources.map((s, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-bg border border-border rounded text-[10px] text-text-secondary">{s}</span>
-                      ))}
-                    </div>
-                  )}
-                  <h3 className="text-[14px] font-semibold text-text-primary mb-1">{opp.title}</h3>
-                  <p className="text-[12px] text-text-secondary leading-relaxed mb-2">{opp.summary}</p>
-                  {opp.tickers && (
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      {opp.tickers.map(t => (
-                        <button key={t.symbol} onClick={() => onSymbolClick?.(t.symbol)}
-                          className="flex items-center gap-1.5 px-2.5 py-1 bg-bg border border-border rounded-lg text-[11px] hover:border-primary cursor-pointer transition">
-                          <span className="font-bold text-text-primary">{t.symbol}</span>
-                          <span className="font-medium">${t.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-                          <span className={`font-medium ${t.changePct >= 0 ? 'text-green' : 'text-red'}`}>
-                            {t.changePct >= 0 ? '↑' : '↓'}{Math.abs(t.changePct)}%
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <button onClick={() => setExpandedOpp(isExpanded ? null : opp.id)}
-                    className="flex items-center gap-1 text-[11px] text-text-tertiary hover:text-primary cursor-pointer transition">
-                    {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                    <span>{isExpanded ? 'Hide details' : 'Show details'}</span>
-                  </button>
-                  {isExpanded && opp.detail && (
-                    <div className="mt-3 pt-3 border-t border-border-light">
-                      <div className="text-[12px] text-text-secondary leading-relaxed whitespace-pre-line">
-                        {opp.detail.split('\n').map((line, i) => {
-                          if (line.startsWith('## ')) return <h4 key={i} className="text-[12px] font-bold text-text-primary mt-3 mb-1">{line.replace('## ', '')}</h4>;
-                          if (line.includes('**')) {
-                            const parts = line.split(/\*\*(.*?)\*\*/g);
-                            return <p key={i}>{parts.map((p, j) => j % 2 === 1 ? <strong key={j}>{p}</strong> : p)}</p>;
-                          }
-                          return line ? <p key={i}>{line}</p> : null;
-                        })}
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
-              );
-            })}
-            <div className="text-center py-4 text-[12px] text-text-tertiary">Scroll for more opportunities...</div>
+              </div>
+              {/* Communication Services */}
+              <div className="col-span-2 row-span-2 bg-green/10 rounded p-1.5">
+                <span className="text-[10px] text-text-secondary mb-1 block">Comm. Services +0.34%</span>
+                <div className="grid grid-cols-2 gap-0.5">
+                  {[{s:'GOOGL',c:3.42},{s:'META',c:1.24},{s:'NFLX',c:-0.62},{s:'TMUS',c:-2.75}].map(t => (
+                    <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                      className={`rounded p-0.5 text-center cursor-pointer hover:opacity-80 ${t.c >= 0 ? 'bg-green/20 text-green' : 'bg-red/10 text-red'}`}>
+                      <div className="font-bold text-[8px]">{t.s}</div>
+                      <div className="text-[7px]">{t.c >= 0 ? '+' : ''}{t.c}%</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Consumer Defensive */}
+              <div className="row-span-2 bg-red/5 rounded p-1.5">
+                <span className="text-[9px] text-text-secondary block mb-0.5">Cons. Def. -0.63%</span>
+                {[{s:'WMT',c:0.37},{s:'PG',c:-0.8},{s:'COST',c:-1.2}].map(t => (
+                  <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                    className={`block w-full rounded p-0.5 text-center mb-0.5 cursor-pointer hover:opacity-80 ${t.c >= 0 ? 'bg-green/15 text-green' : 'bg-red/10 text-red'}`}>
+                    <div className="font-bold text-[8px]">{t.s} {t.c >= 0 ? '+' : ''}{t.c}%</div>
+                  </button>
+                ))}
+              </div>
+              {/* Healthcare */}
+              <div className="row-span-2 bg-green/5 rounded p-1.5">
+                <span className="text-[9px] text-text-secondary block mb-0.5">Healthcare +0.76%</span>
+                {[{s:'LLY',c:3.75},{s:'JNJ',c:-0.13},{s:'MRK',c:0.49},{s:'PFE',c:-0.3}].map(t => (
+                  <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                    className={`block w-full rounded p-0.5 text-center mb-0.5 cursor-pointer hover:opacity-80 ${t.c >= 0 ? 'bg-green/15 text-green' : 'bg-red/10 text-red'}`}>
+                    <div className="font-bold text-[8px]">{t.s} {t.c >= 0 ? '+' : ''}{t.c}%</div>
+                  </button>
+                ))}
+              </div>
+              {/* Consumer Cyclical */}
+              <div className="col-span-2 bg-green/5 rounded p-1.5">
+                <span className="text-[9px] text-text-secondary block mb-0.5">Consumer Cyclical +0.75%</span>
+                <div className="flex gap-0.5">
+                  {[{s:'AMZN',c:1.10},{s:'TSLA',c:2.56},{s:'HD',c:0.20}].map(t => (
+                    <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                      className={`flex-1 rounded p-0.5 text-center cursor-pointer hover:opacity-80 ${t.c >= 0 ? 'bg-green/20 text-green' : 'bg-red/10 text-red'}`}>
+                      <div className="font-bold text-[8px]">{t.s}</div>
+                      <div className="text-[7px]">+{t.c}%</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Financial Services */}
+              <div className="col-span-2 bg-green/5 rounded p-1.5">
+                <span className="text-[9px] text-text-secondary block mb-0.5">Financial +0.14%</span>
+                <div className="flex gap-0.5">
+                  {[{s:'BRK-B',c:-0.15},{s:'JPM',c:1.07},{s:'V',c:-1.23},{s:'BAC',c:0.5}].map(t => (
+                    <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                      className={`flex-1 rounded p-0.5 text-center cursor-pointer hover:opacity-80 ${t.c >= 0 ? 'bg-green/15 text-green' : 'bg-red/10 text-red'}`}>
+                      <div className="font-bold text-[8px]">{t.s}</div>
+                      <div className="text-[7px]">{t.c >= 0 ? '+' : ''}{t.c}%</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Energy */}
+              <div className="bg-red/10 rounded p-1.5">
+                <span className="text-[9px] text-text-secondary block mb-0.5">Energy -3.74%</span>
+                {[{s:'XOM',c:-5.23},{s:'CVX',c:-4.62}].map(t => (
+                  <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                    className="block w-full rounded p-0.5 text-center mb-0.5 bg-red/15 text-red cursor-pointer hover:opacity-80">
+                    <div className="font-bold text-[8px]">{t.s} {t.c}%</div>
+                  </button>
+                ))}
+              </div>
+              {/* Industrials */}
+              <div className="bg-green/5 rounded p-1.5">
+                <span className="text-[9px] text-text-secondary block mb-0.5">Industrials +1.67%</span>
+                {[{s:'CAT',c:3.09},{s:'GE',c:3.14},{s:'BA',c:-0.5}].map(t => (
+                  <button key={t.s} onClick={() => onSymbolClick?.(t.s)}
+                    className={`block w-full rounded p-0.5 text-center mb-0.5 cursor-pointer hover:opacity-80 ${t.c >= 0 ? 'bg-green/15 text-green' : 'bg-red/10 text-red'}`}>
+                    <div className="font-bold text-[8px]">{t.s} {t.c >= 0 ? '+' : ''}{t.c}%</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-2 px-1 text-[9px] text-text-tertiary">
+              <div className="flex items-center gap-1">
+                <span>-3%</span>
+                <div className="flex gap-0.5">
+                  {['#fecaca','#fde8e8','#f3f4f6','#dcfce7','#bbf7d0'].map(c => (
+                    <div key={c} className="w-3 h-2 rounded-sm" style={{ background: c }} />
+                  ))}
+                </div>
+                <span>+3%</span>
+              </div>
+              <span>Apr 1, 2026, 4:00 PM EDT</span>
+            </div>
           </div>
         </section>
 
-        {/* News & Analysis */}
+        {/* News & Analysis (infinite scroll, no View History) */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-[16px] font-semibold">News & Analysis</h2>
             <div className="flex gap-1">
-              {['All', 'News', 'Research', 'Analysis'].map(f => (
+              {['All', 'News', 'Analysis'].map(f => (
                 <button key={f} onClick={() => setNewsFilter(f)}
                   className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition cursor-pointer
                     ${newsFilter === f ? 'bg-primary text-white' : 'text-text-secondary hover:bg-gray-100'}`}>
@@ -261,36 +324,9 @@ export default function MacroIntelligence({ onSymbolClick }) {
           </div>
           <div className="space-y-3">
             {newsAnalysis.filter(n => newsFilter === 'All' || n.category === newsFilter).map(n => (
-              <div key={n.id} className="card flex gap-4 hover:shadow-sm transition-shadow cursor-pointer">
-                {n.image && (
-                  <div className="w-[100px] h-[72px] rounded-lg bg-gray-100 shrink-0 flex items-center justify-center overflow-hidden">
-                    <div className="text-[20px]">{n.image}</div>
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`badge ${n.category === 'News' ? 'badge-blue' : n.category === 'Research' ? 'badge-green' : 'badge-orange'}`}>
-                      {n.category}
-                    </span>
-                    <span className="text-[10px] text-text-tertiary">{n.source}</span>
-                    <span className="text-[10px] text-text-tertiary">•</span>
-                    <span className="text-[10px] text-text-tertiary">{n.time}</span>
-                  </div>
-                  <h3 className="text-[13px] font-semibold text-text-primary mb-1 leading-snug">{n.title}</h3>
-                  <p className="text-[11px] text-text-secondary leading-relaxed line-clamp-2">{n.summary}</p>
-                  {n.tickers && (
-                    <div className="flex gap-1.5 mt-2">
-                      {n.tickers.map(t => (
-                        <span key={t} onClick={(e) => { e.stopPropagation(); onSymbolClick?.(t); }}
-                          className="px-2 py-0.5 bg-bg border border-border rounded text-[10px] font-semibold text-primary hover:bg-primary-50 cursor-pointer transition">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <NewsCard key={n.id} item={n} onSymbolClick={onSymbolClick} />
             ))}
+            <div className="text-center py-4 text-[12px] text-text-tertiary">Scroll for more...</div>
           </div>
         </section>
       </div>
@@ -304,7 +340,7 @@ export default function MacroIntelligence({ onSymbolClick }) {
           </div>
           <div className="divide-y divide-border-light">
             {watchlistData.map(w => (
-              <div key={w.symbol} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer">
+              <div key={w.symbol} onClick={() => onSymbolClick?.(w.symbol)} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
                   style={{ background: w.color }}>
                   {w.symbol.charAt(0)}
@@ -342,7 +378,7 @@ export default function MacroIntelligence({ onSymbolClick }) {
           </div>
           <div className="divide-y divide-border-light">
             {moversData[moverTab].map(m => (
-              <div key={m.symbol} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer">
+              <div key={m.symbol} onClick={() => onSymbolClick?.(m.symbol)} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition cursor-pointer">
                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-text-secondary shrink-0">
                   {m.symbol.substring(0, 2)}
                 </div>

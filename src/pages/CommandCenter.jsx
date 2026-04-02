@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Newspaper, BarChart3, FileText, AlertTriangle, ChevronDown, ChevronUp, Shield, CheckCircle, Clock } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronUp, Shield, CheckCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { holdings, portfolioSummary, recommendations, alphaReturns, healthScore, riskFactors, homeNewsAnalysis } from '../data/mockData';
 import PortfolioSwitcher from '../components/PortfolioSwitcher';
+import RecommendationCard from '../components/RecommendationCard';
+import NewsCard from '../components/NewsCard';
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#6366f1'];
 const urgencyColors = { high: 'badge-red', medium: 'badge-orange', low: 'badge-blue' };
@@ -46,8 +48,6 @@ function ScoreGauge({ score, max }) {
 }
 
 export default function CommandCenter({ onSymbolClick, portfolios, activePortfolioId, onSwitchPortfolio, onCreateNew, onEditPortfolio, onDeletePortfolio, hasPortfolios }) {
-  const [expandedRec, setExpandedRec] = useState(null);
-  const [expandedSources, setExpandedSources] = useState(null);
   const [showAlphaDetail, setShowAlphaDetail] = useState(false);
   const [expandedRisk, setExpandedRisk] = useState(null);
   const [newsFilter, setNewsFilter] = useState('All');
@@ -190,66 +190,9 @@ export default function CommandCenter({ onSymbolClick, portfolios, activePortfol
       <section>
         <h2 className="text-[16px] font-semibold mb-4">Investment Recommendations</h2>
         <div className="space-y-3">
-          {recommendations.slice(0, 5).map(rec => {
-            const isExpanded = expandedRec === rec.id;
-            const sourcesOpen = expandedSources === rec.id;
-            return (
-              <div key={rec.id} className="card">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className={`badge ${urgencyColors[rec.urgency]}`}>{rec.urgency}</span>
-                  <button onClick={() => setExpandedSources(sourcesOpen ? null : rec.id)}
-                    className="text-[11px] text-text-tertiary hover:text-primary cursor-pointer">
-                    {rec.sourceCount} sources {sourcesOpen ? '▲' : '▼'}
-                  </button>
-                  <span className="text-[11px] text-text-tertiary">{rec.timestamp}</span>
-                </div>
-                {sourcesOpen && (
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {rec.sources.map((s, i) => (
-                      <span key={i} className="px-2 py-0.5 bg-bg border border-border rounded text-[10px] text-text-secondary">{s}</span>
-                    ))}
-                  </div>
-                )}
-                <h3 className="text-[14px] font-semibold text-text-primary mb-1">{rec.title}</h3>
-                <p className="text-[12px] text-text-secondary leading-relaxed mb-2">{rec.summary}</p>
-                {/* Symbol Tags */}
-                {rec.tickers && (
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {rec.tickers.map(t => (
-                      <button key={t.symbol} onClick={() => onSymbolClick?.(t.symbol)}
-                        className="flex items-center gap-1.5 px-2.5 py-1 bg-bg border border-border rounded-lg text-[11px] hover:border-primary cursor-pointer transition">
-                        <span className="font-bold text-text-primary">{t.symbol}</span>
-                        <span className="font-medium">${t.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-                        <span className={`font-medium ${t.changePct >= 0 ? 'text-green' : 'text-red'}`}>
-                          {t.changePct >= 0 ? '↑' : '↓'}{Math.abs(t.changePct)}%
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {/* Expand Arrow */}
-                <button onClick={() => setExpandedRec(isExpanded ? null : rec.id)}
-                  className="flex items-center gap-1 text-[11px] text-text-tertiary hover:text-primary cursor-pointer transition">
-                  {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  <span>{isExpanded ? 'Hide details' : 'Show details'}</span>
-                </button>
-                {isExpanded && rec.detail && (
-                  <div className="mt-3 pt-3 border-t border-border-light prose prose-sm max-w-none">
-                    <div className="text-[12px] text-text-secondary leading-relaxed whitespace-pre-line">
-                      {rec.detail.split('\n').map((line, i) => {
-                        if (line.startsWith('## ')) return <h4 key={i} className="text-[12px] font-bold text-text-primary mt-3 mb-1">{line.replace('## ', '')}</h4>;
-                        if (line.includes('**')) {
-                          const parts = line.split(/\*\*(.*?)\*\*/g);
-                          return <p key={i}>{parts.map((p, j) => j % 2 === 1 ? <strong key={j}>{p}</strong> : p)}</p>;
-                        }
-                        return line ? <p key={i}>{line}</p> : null;
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {recommendations.slice(0, 5).map(rec => (
+            <RecommendationCard key={rec.id} rec={rec} onSymbolClick={onSymbolClick} />
+          ))}
         </div>
         <button className="mt-3 w-full py-2.5 text-[12px] font-medium text-primary hover:bg-primary-50 rounded-lg transition cursor-pointer">
           View History →
@@ -272,26 +215,7 @@ export default function CommandCenter({ onSymbolClick, portfolios, activePortfol
         </div>
         <div className="space-y-3">
           {homeNewsAnalysis.filter(n => newsFilter === 'All' || n.category === newsFilter).slice(0, 5).map(n => (
-            <div key={n.id} className="card hover:shadow-sm transition-shadow cursor-pointer">
-              <div className="flex items-center gap-2 mb-1">
-                <span className={`badge ${n.category === 'News' ? 'badge-blue' : 'badge-orange'}`}>{n.category}</span>
-                <span className="text-[10px] text-text-tertiary">{n.source}</span>
-                <span className="text-[10px] text-text-tertiary">•</span>
-                <span className="text-[10px] text-text-tertiary">{n.time}</span>
-              </div>
-              <h3 className="text-[13px] font-semibold text-text-primary mb-1">{n.title}</h3>
-              <p className="text-[11px] text-text-secondary leading-relaxed mb-2">{n.summary}</p>
-              {n.tickers && (
-                <div className="flex gap-1.5">
-                  {n.tickers.map(t => (
-                    <button key={t} onClick={(e) => { e.stopPropagation(); onSymbolClick?.(t); }}
-                      className="px-2 py-0.5 bg-bg border border-border rounded text-[10px] font-semibold text-primary hover:bg-primary-50 cursor-pointer transition">
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <NewsCard key={n.id} item={n} onSymbolClick={onSymbolClick} />
           ))}
         </div>
         <button className="mt-3 w-full py-2.5 text-[12px] font-medium text-primary hover:bg-primary-50 rounded-lg transition cursor-pointer">
