@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import ChatBar from './components/ChatBar';
@@ -74,6 +74,20 @@ export default function App() {
     setViewingSymbol(null);
   };
 
+  // Search must be before early return to satisfy Rules of Hooks
+  const searchSymbols = [
+    { symbol: 'NVDA', name: 'NVIDIA Corporation' }, { symbol: 'AAPL', name: 'Apple Inc.' },
+    { symbol: 'MSFT', name: 'Microsoft Corporation' }, { symbol: 'GOOG', name: 'Alphabet Inc.' },
+    { symbol: 'AMZN', name: 'Amazon.com Inc.' }, { symbol: 'TSLA', name: 'Tesla Inc.' },
+    { symbol: 'META', name: 'Meta Platforms' }, { symbol: 'BTC-USD', name: 'Bitcoin USD' },
+    { symbol: 'XAUUSD', name: 'Gold Spot' }, { symbol: 'TCEHY', name: 'Tencent Holdings' },
+    { symbol: 'MTCH', name: 'Match Group' }, { symbol: 'JPM', name: 'JPMorgan Chase' },
+    { symbol: 'AVGO', name: 'Broadcom Inc.' }, { symbol: 'AMD', name: 'Advanced Micro Devices' },
+  ];
+  const searchResults = searchQuery.length >= 1
+    ? searchSymbols.filter(s => s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || s.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 8)
+    : [];
+
   if (!user) {
     if (authScreen === 'register') {
       return <Register onRegister={handleRegister} onSwitchToLogin={() => setAuthScreen('login')} />;
@@ -86,21 +100,6 @@ export default function App() {
   const showEmpty = pages[activePage].needsPortfolio && !hasPortfolios && !viewingSymbol;
   const showChatBar = activePage !== 'workspace';
   const headerTitle = viewingSymbol ? viewingSymbol : pages[activePage].title;
-
-  const searchSymbols = [
-    { symbol: 'NVDA', name: 'NVIDIA Corporation' }, { symbol: 'AAPL', name: 'Apple Inc.' },
-    { symbol: 'MSFT', name: 'Microsoft Corporation' }, { symbol: 'GOOG', name: 'Alphabet Inc.' },
-    { symbol: 'AMZN', name: 'Amazon.com Inc.' }, { symbol: 'TSLA', name: 'Tesla Inc.' },
-    { symbol: 'META', name: 'Meta Platforms' }, { symbol: 'BTC-USD', name: 'Bitcoin USD' },
-    { symbol: 'XAUUSD', name: 'Gold Spot' }, { symbol: 'TCEHY', name: 'Tencent Holdings' },
-    { symbol: 'MTCH', name: 'Match Group' }, { symbol: 'JPM', name: 'JPMorgan Chase' },
-    { symbol: 'AVGO', name: 'Broadcom Inc.' }, { symbol: 'AMD', name: 'Advanced Micro Devices' },
-  ];
-  const searchResults = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 1) return [];
-    const q = searchQuery.toLowerCase();
-    return searchSymbols.filter(s => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)).slice(0, 8);
-  }, [searchQuery]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg">

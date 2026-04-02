@@ -664,28 +664,65 @@ export default function SymbolDetail({ symbol, onBack }) {
         </div>
       )}
 
-      {/* Price Alert Modal */}
+      {/* Price Alert Modal (matches Notifications create alert format) */}
       {showAlertModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setShowAlertModal(false)}>
-          <div className="bg-surface rounded-2xl shadow-xl w-full max-w-[400px] p-6" onClick={e => e.stopPropagation()}>
-            <h3 className="text-[16px] font-bold mb-4">Price Alert — {data.symbol}</h3>
-            <div className="space-y-3">
+          <div className="bg-surface rounded-2xl shadow-xl w-full max-w-[460px] p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-bold">Price Alert — {data.symbol}</h3>
+              <span className="text-[12px] text-text-tertiary">Currently ${data.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+            </div>
+
+            <div className="space-y-4">
+              {/* Alert Criteria */}
               <div>
-                <label className="text-[12px] font-medium text-text-secondary mb-1 block">Alert When Price</label>
+                <label className="text-[12px] font-medium text-text-secondary mb-1.5 block">Alert Criteria</label>
                 <div className="flex gap-2">
-                  <select className="flex-1 px-3 py-2.5 bg-bg border border-border rounded-lg text-[13px] outline-none">
-                    <option>Drops Below</option><option>Rises Above</option>
-                  </select>
-                  <input type="number" defaultValue={Math.round(data.price * 0.95)} className="w-[120px] px-3 py-2.5 bg-bg border border-border rounded-lg text-[13px] outline-none" />
+                  <button className="flex-1 px-3 py-2.5 rounded-lg text-[12px] font-medium border bg-primary-50 text-primary border-primary cursor-pointer">
+                    Target Price
+                  </button>
+                  <button className="flex-1 px-3 py-2.5 rounded-lg text-[12px] font-medium border border-border text-text-secondary hover:border-primary cursor-pointer">
+                    Movement Amount
+                  </button>
                 </div>
               </div>
+
+              {/* Target Value */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[12px] font-medium text-text-secondary mb-1.5 block">Condition</label>
+                  <select className="w-full px-3 py-2.5 bg-bg border border-border rounded-lg text-[13px] outline-none focus:border-primary">
+                    <option>Drops Below</option>
+                    <option>Rises Above</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[12px] font-medium text-text-secondary mb-1.5 block">Target Price</label>
+                  <input type="number" defaultValue={Math.round(data.price * 0.95 * 100) / 100} step="0.01"
+                    className="w-full px-3 py-2.5 bg-bg border border-border rounded-lg text-[13px] outline-none focus:border-primary" />
+                </div>
+              </div>
+
+              {/* Notification Platform */}
               <div>
-                <label className="text-[12px] font-medium text-text-secondary mb-1 block">Notification</label>
-                <select className="w-full px-3 py-2.5 bg-bg border border-border rounded-lg text-[13px] outline-none">
-                  <option>In-app and Email</option><option>In-app only</option><option>Email only</option>
+                <label className="text-[12px] font-medium text-text-secondary mb-1.5 block">Notification Platform</label>
+                <select className="w-full px-3 py-2.5 bg-bg border border-border rounded-lg text-[13px] outline-none focus:border-primary">
+                  <option>In-app and Email</option>
+                  <option>In-app only</option>
+                  <option>Email only</option>
                 </select>
               </div>
+
+              {/* Default Query */}
+              <div>
+                <label className="text-[12px] font-medium text-text-secondary mb-1.5 block">Default Query (AI will analyze when alert triggers)</label>
+                <textarea
+                  defaultValue={`Explain the factors driving the latest movement of ${data.symbol} (${data.name}), including recent price context and investor narrative.`}
+                  className="w-full h-20 px-3 py-2.5 bg-bg border border-border rounded-lg text-[13px] outline-none resize-none focus:border-primary"
+                />
+              </div>
             </div>
+
             <div className="flex gap-2 mt-5">
               <button onClick={() => setShowAlertModal(false)} className="flex-1 py-2.5 border border-border rounded-xl text-[13px] font-medium cursor-pointer hover:bg-gray-50">Cancel</button>
               <button onClick={() => setShowAlertModal(false)} className="flex-1 py-2.5 bg-primary text-white rounded-xl text-[13px] font-semibold cursor-pointer hover:bg-primary-light">Save Alert</button>
